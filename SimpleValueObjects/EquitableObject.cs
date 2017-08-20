@@ -5,6 +5,8 @@
 
 namespace SimpleValueObjects
 {
+    // todo: how to force GetHashCode implementation?
+
     public abstract class EquitableObject<T> : IEquatable<T>
         where T : EquitableObject<T>
     {
