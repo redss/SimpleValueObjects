@@ -2,9 +2,6 @@
 
 namespace SimpleValueObjects
 {
-    // todo: implement IComparable
-    // todo: how to force GetHashCode implementation?
-
     public abstract class ComparableObject<T> : EquitableObject<T>, IComparable<T>, IComparable
         where T : ComparableObject<T>
     {
@@ -13,21 +10,16 @@ namespace SimpleValueObjects
             return CompareTo(notNullOther) == 0;
         }
 
-        public int CompareTo(object obj)
+        int IComparable.CompareTo(object other)
         {
-            if (obj is T || ReferenceEquals(obj, null))
+            if (other is T || ReferenceEquals(other, null))
             {
-                return CompareToWithNullCheck((T) obj);
+                return CompareToWithNullCheck((T) other);
             }
 
-            if (!(obj is T))
-            {
-                throw new ArgumentException(
-                    $"Cannot compare object of type {typeof(T).Name} (this type) " +
-                    $"to object of type {obj.GetType().Name} (other type).");
-            }
-
-            return CompareToWithNullCheck(obj as T);
+            throw new ArgumentException(
+                $"Cannot compare object of type {typeof(T).Name} (this type) " +
+                $"to object of type {other.GetType().Name} (other type).");
         }
 
         int IComparable<T>.CompareTo(T notNullOther)
@@ -38,6 +30,7 @@ namespace SimpleValueObjects
         private int CompareToWithNullCheck(T other)
         {
             // todo: explain or reference
+            // todo: is reference equals necessary (won't just == do)?
             return ReferenceEquals(other, null)
                 ? 1
                 : CompareTo(other);

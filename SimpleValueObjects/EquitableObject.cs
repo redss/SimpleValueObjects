@@ -5,8 +5,6 @@
 
 namespace SimpleValueObjects
 {
-    // todo: how to force GetHashCode implementation?
-
     public abstract class EquitableObject<T> : IEquatable<T>
         where T : EquitableObject<T>
     {
@@ -22,7 +20,7 @@ namespace SimpleValueObjects
                 : first.Equals(second);
         }
 
-        public override bool Equals(object other)
+        public sealed override bool Equals(object other)
         {
             return EqualsWithNullCheck(other as T);
         }
@@ -38,5 +36,13 @@ namespace SimpleValueObjects
         }
 
         protected abstract bool Equals(T notNullOther);
+
+        public sealed override int GetHashCode()
+        {
+            return GenerateHashCode();
+        }
+
+        // todo: hmm
+        public abstract int GenerateHashCode();
     }
 }
