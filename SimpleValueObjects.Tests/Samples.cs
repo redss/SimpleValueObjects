@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SimpleValueObjects.Tests
 {
@@ -27,6 +28,24 @@ namespace SimpleValueObjects.Tests
                     $"but found '{value}' which is {value.Length} characters long.",
                     nameof(value));
             }
+        }
+    }
+
+    public class SpecificMonth : AutoComparableObject<SpecificMonth>
+    {
+        public int Year { get; }
+        public int Month { get; }
+
+        public SpecificMonth(int year, int month)
+        {
+            Year = year;
+            Month = month;
+        }
+
+        protected override IEnumerable<IComparable> GetValuesForComparison()
+        {
+            yield return Year;
+            yield return Month;
         }
     }
 }

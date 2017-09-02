@@ -8,7 +8,7 @@ namespace SimpleValueObjects
     public abstract class AutoEquitableObject<T> : EquitableObject<T>
         where T : AutoEquitableObject<T>
     {
-        protected override bool Equals(T notNullOther)
+        protected sealed override bool Equals(T notNullOther)
         {
             return GetType()
                 .GetRuntimeFields() // todo: this method might not cut it
