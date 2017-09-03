@@ -32,7 +32,7 @@ namespace SimpleValueObjects
 
         private bool EqualsWithNullCheck(T other)
         {
-            return other != null && Equals(other);
+            return !ReferenceEquals(other, null) && Equals(other);
         }
 
         protected abstract bool Equals(T notNullOther);
