@@ -6,6 +6,7 @@ namespace SimpleValueObjects
 {
     internal static class TypeExtensions
     {
+        // todo: include subtypes' fields
         public static FieldInfo[] GetInstanceFields(this Type type)
         {
             return type.GetRuntimeFields()

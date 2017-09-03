@@ -1,34 +1,50 @@
 ﻿using System.Linq;
 using System.Reflection;
 
+// ReSharper disable StaticMemberInGenericType - this is our intention
+
 namespace SimpleValueObjects
 {
-    // todo: think about better name
-
     public abstract class AutoEquitableObject<T> : EquitableObject<T>
         where T : AutoEquitableObject<T>
     {
+        private static readonly FieldInfo[] _fields;
+
+        static AutoEquitableObject()
+        {
+            _fields = typeof(T).GetInstanceFields();
+        }
+
         protected sealed override bool IsEqual(T notNullOther)
         {
-            return GetType()
-                .GetRuntimeFields()
-                .Where(field => !field.IsStatic)
-                .Where(field => !field.IsLiteral)
-                .All(field => FieldValuesAreEqual(field, this, notNullOther));
+            return _fields.All(field => FieldValuesAreEqual(field, this, notNullOther));
         }
 
         private static bool FieldValuesAreEqual(FieldInfo fieldInfo, object first, object second)
         {
-            var thisValue = fieldInfo.GetValue(first);
-            var otherValue = fieldInfo.GetValue(second);
-
-            // todo: double check this approach
-            return !ReferenceEquals(thisValue, null) && thisValue.Equals(otherValue);
+            return Equals(fieldInfo.GetValue(first), fieldInfo.GetValue(second));
         }
 
-        protected override int GenerateHashCode()
+        // GetHashCode implementation is based on https://stackoverflow.com/a/263416
+        // and https://stackoverflow.com/a/2816747
+
+        private const int HashCodePrime = 92821;
+
+        protected sealed override int GenerateHashCode()
         {
-            throw new System.NotImplementedException();
+            return _fields.Aggregate(
+                seed: HashCodePrime,
+                func: IncludeFieldInHashCode);
+        }
+
+        private int IncludeFieldInHashCode(int hashCode, FieldInfo field)
+        {
+            unchecked
+            {
+                var fieldsHashCode = field.GetValue(this)?.GetHashCode() ?? 0;
+
+                return hashCode * HashCodePrime + fieldsHashCode;
+            }
         }
     }
 }
