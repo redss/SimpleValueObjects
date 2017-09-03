@@ -11,7 +11,9 @@ namespace SimpleValueObjects
         protected sealed override bool IsEqual(T notNullOther)
         {
             return GetType()
-                .GetRuntimeFields() // todo: this method might not cut it
+                .GetRuntimeFields()
+                .Where(field => !field.IsStatic)
+                .Where(field => !field.IsLiteral)
                 .All(field => FieldValuesAreEqual(field, this, notNullOther));
         }
 
