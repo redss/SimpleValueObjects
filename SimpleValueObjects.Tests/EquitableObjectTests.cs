@@ -1,5 +1,4 @@
-﻿using System;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
 
 // ReSharper disable ExpressionIsAlwaysNull
@@ -9,6 +8,8 @@ using NUnit.Framework;
 
 namespace SimpleValueObjects.Tests
 {
+    // todo: should we test subclassing?
+
     public class EquitableObjectTests
     {
         [Test]
@@ -80,14 +81,14 @@ namespace SimpleValueObjects.Tests
 
         private static void ShouldBeEqualAccordingToEqualsMethods(SomeEquitableObject first, SomeEquitableObject second)
         {
+            first.Equals((object)second).Should().BeTrue();
             first.Equals(second).Should().BeTrue();
-            ((IEquatable<SomeEquitableObject>)first).Equals(second).Should().BeTrue();
         }
 
         private static void ShouldNotBeEqualAccordingToEqualsMethods(SomeEquitableObject first, SomeEquitableObject second)
         {
+            first.Equals((object)second).Should().BeFalse();
             first.Equals(second).Should().BeFalse();
-            ((IEquatable<SomeEquitableObject>)first).Equals(second).Should().BeFalse();
         }
 
         class SomeEquitableObject : EquitableObject<SomeEquitableObject>
@@ -96,9 +97,9 @@ namespace SimpleValueObjects.Tests
 
             public SomeEquitableObject(int value) => _value = value;
 
-            protected override bool Equals(SomeEquitableObject notNullOther) => _value == notNullOther._value;
+            protected override bool IsEqual(SomeEquitableObject notNullOther) => _value == notNullOther._value;
 
-            public override int GenerateHashCode() => _value;
+            protected override int GenerateHashCode() => _value;
         }
     }
 }

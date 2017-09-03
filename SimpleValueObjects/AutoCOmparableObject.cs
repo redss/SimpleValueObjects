@@ -38,7 +38,7 @@ namespace SimpleValueObjects
             return 0;
         }
 
-        public sealed override int GenerateHashCode()
+        protected sealed override int GenerateHashCode()
         {
             throw new NotImplementedException();
         }

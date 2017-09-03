@@ -30,7 +30,7 @@ namespace SimpleValueObjects
             return Value.CompareTo(notNullOther);
         }
 
-        public override int GenerateHashCode()
+        protected override int GenerateHashCode()
         {
             return Value.GetHashCode();
         }

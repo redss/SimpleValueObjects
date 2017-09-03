@@ -24,12 +24,12 @@ namespace SimpleValueObjects
             return wrapper.Value;
         }
 
-        protected override bool Equals(T notNullOther)
+        protected override bool IsEqual(T notNullOther)
         {
             return Value.Equals(notNullOther.Value);
         }
 
-        public override int GenerateHashCode()
+        protected override int GenerateHashCode()
         {
             return Value.GetHashCode();
         }

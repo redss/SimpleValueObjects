@@ -1,8 +1,5 @@
 ﻿using System;
 
-// todo: check all these warnings
-#pragma warning disable 660,661,659 // we expect child class to implement GetHashCode
-
 namespace SimpleValueObjects
 {
     public abstract class EquitableObject<T> : IEquatable<T>
@@ -25,24 +22,25 @@ namespace SimpleValueObjects
             return EqualsWithNullCheck(other as T);
         }
 
-        bool IEquatable<T>.Equals(T notNullOther)
+        public bool Equals(T other)
         {
-            return EqualsWithNullCheck(notNullOther);
+            return EqualsWithNullCheck(other);
         }
 
         private bool EqualsWithNullCheck(T other)
         {
-            return !ReferenceEquals(other, null) && Equals(other);
+            return !ReferenceEquals(other, null) && IsEqual(other);
         }
 
-        protected abstract bool Equals(T notNullOther);
+        protected abstract bool IsEqual(T notNullOther);
+
+        // todo: is enforcing GetHashCode implementation necessary?
 
         public sealed override int GetHashCode()
         {
             return GenerateHashCode();
         }
 
-        // todo: hmm
-        public abstract int GenerateHashCode();
+        protected abstract int GenerateHashCode();
     }
 }

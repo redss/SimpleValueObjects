@@ -5,7 +5,7 @@ namespace SimpleValueObjects
     public abstract class ComparableObject<T> : EquitableObject<T>, IComparable<T>, IComparable
         where T : ComparableObject<T>
     {
-        protected override bool Equals(T notNullOther)
+        protected override bool IsEqual(T notNullOther)
         {
             return CompareTo(notNullOther) == 0;
         }
@@ -30,7 +30,6 @@ namespace SimpleValueObjects
         private int CompareToWithNullCheck(T other)
         {
             // todo: explain or reference
-            // todo: is reference equals necessary (won't just == do)?
             return ReferenceEquals(other, null)
                 ? 1
                 : CompareTo(other);
