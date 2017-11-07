@@ -9,7 +9,7 @@ namespace SimpleValueObjects
     {
         protected abstract IEnumerable<IComparable> GetValuesForComparison();
 
-        protected sealed override int CompareTo(T notNullOther)
+        protected sealed override int CompareToNotNull(T notNullOther)
         {
             var valuesForComparison = GetValuesForComparison().ToArray();
             var otherValuesForComparison = notNullOther.GetValuesForComparison().ToArray();

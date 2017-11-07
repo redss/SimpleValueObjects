@@ -12,6 +12,8 @@ namespace SimpleValueObjects.Tests
 
     public class EquitableObjectTests
     {
+        // todo: equals with other type
+
         [Test]
         public void identical_objects_are_always_equal_equal()
         {

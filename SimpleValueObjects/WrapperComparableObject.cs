@@ -25,7 +25,7 @@ namespace SimpleValueObjects
             return wrapper.Value;
         }
 
-        protected override int CompareTo(T notNullOther)
+        protected override int CompareToNotNull(T notNullOther)
         {
             return Value.CompareTo(notNullOther);
         }

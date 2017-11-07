@@ -7,34 +7,69 @@ namespace SimpleValueObjects
     {
         protected override bool IsEqual(T notNullOther)
         {
-            return CompareTo(notNullOther) == 0;
+            return CompareToNotNull(notNullOther) == 0;
         }
 
         int IComparable.CompareTo(object other)
         {
             if (other is T || ReferenceEquals(other, null))
             {
-                return CompareToWithNullCheck((T) other);
+                return CompareTo((T)other);
             }
 
             throw new ArgumentException(
                 $"Cannot compare object of type {typeof(T).Name} (this type) " +
-                $"to object of type {other.GetType().Name} (other type).");
+                $"with object of type {other.GetType().Name} (other type) using CompareTo(object).");
         }
 
-        int IComparable<T>.CompareTo(T notNullOther)
+        public int CompareTo(T other)
         {
-            return CompareToWithNullCheck(notNullOther);
-        }
-
-        private int CompareToWithNullCheck(T other)
-        {
-            // todo: explain or reference
             return ReferenceEquals(other, null)
                 ? 1
-                : CompareTo(other);
+                : CompareToNotNull(other);
         }
 
-        protected abstract int CompareTo(T notNullOther);
+        protected abstract int CompareToNotNull(T notNullOther);
+
+        public static bool operator >(ComparableObject<T> first, ComparableObject<T> second)
+        {
+            return Compare(first, second) > 0;
+        }
+
+        public static bool operator >=(ComparableObject<T> first, ComparableObject<T> second)
+        {
+            return Compare(first, second) >= 0;
+        }
+
+        public static bool operator <=(ComparableObject<T> first, ComparableObject<T> second)
+        {
+            return Compare(first, second) <= 0;
+        }
+
+        public static bool operator <(ComparableObject<T> first, ComparableObject<T> second)
+        {
+            return Compare(first, second) < 0;
+        }
+
+        public static int Compare(ComparableObject<T> first, ComparableObject<T> second)
+        {
+            if (ReferenceEquals(first, null) && ReferenceEquals(second, null))
+            {
+                return 0;
+            }
+
+            if (ReferenceEquals(first, null))
+            {
+                return -1;
+            }
+
+            if (ReferenceEquals(second, null))
+            {
+                return 1;
+            }
+
+            // todo: hmm
+            return first.CompareToNotNull((T)second);
+        }
     }
 }
