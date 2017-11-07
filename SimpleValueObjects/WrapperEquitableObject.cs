@@ -9,10 +9,10 @@ namespace SimpleValueObjects
 
         protected WrapperEquitableObject(TWrapped value)
         {
-            if (ReferenceEquals(value, null))
+            if (value == null)
             {
                 throw new ArgumentException(
-                    $"{GetType().Name} cannot wrap null value.",
+                    $"Cannot wrap null value in WrapperComparableObject of {typeof(TWrapped).Name}.",
                     nameof(value));
             }
 

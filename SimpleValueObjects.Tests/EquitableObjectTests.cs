@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
 
+// ReSharper disable SuspiciousTypeConversion.Global
+
 // ReSharper disable ExpressionIsAlwaysNull
 
 // ReSharper disable ConditionIsAlwaysTrueOrFalse - since we're
@@ -8,12 +10,8 @@ using NUnit.Framework;
 
 namespace SimpleValueObjects.Tests
 {
-    // todo: should we test subclassing?
-
     public class EquitableObjectTests
     {
-        // todo: equals with other type
-
         [Test]
         public void identical_objects_are_always_equal_equal()
         {
@@ -63,6 +61,14 @@ namespace SimpleValueObjects.Tests
 
             ShouldBeEqualAccordingToEqualityOperators(something, something);
             ShouldBeEqualAccordingToEqualsMethods(something, something);
+        }
+
+        [Test]
+        public void two_different_types_are_never_equal()
+        {
+            var something = new SomeEquitableObject(1);
+
+            something.Equals("some string").Should().BeFalse();
         }
 
         private static void ShouldBeEqualAccordingToEqualityOperators(SomeEquitableObject first, SomeEquitableObject second)

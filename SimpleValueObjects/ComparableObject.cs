@@ -51,25 +51,19 @@ namespace SimpleValueObjects
             return Compare(first, second) < 0;
         }
 
-        public static int Compare(ComparableObject<T> first, ComparableObject<T> second)
+        public static implicit operator T(ComparableObject<T> comparableObject)
         {
-            if (ReferenceEquals(first, null) && ReferenceEquals(second, null))
+            return (T) comparableObject;
+        }
+
+        public static int Compare(T first, T second)
+        {
+            if (first != null)
             {
-                return 0;
+                return first.CompareTo(second);
             }
 
-            if (ReferenceEquals(first, null))
-            {
-                return -1;
-            }
-
-            if (ReferenceEquals(second, null))
-            {
-                return 1;
-            }
-
-            // todo: hmm
-            return first.CompareToNotNull((T)second);
+            return second == null ? 0 : -1;
         }
     }
 }

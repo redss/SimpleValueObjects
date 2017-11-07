@@ -19,15 +19,10 @@ namespace SimpleValueObjects
 
         public sealed override bool Equals(object other)
         {
-            return EqualsWithNullCheck(other as T);
+            return Equals(other as T);
         }
 
         public bool Equals(T other)
-        {
-            return EqualsWithNullCheck(other);
-        }
-
-        private bool EqualsWithNullCheck(T other)
         {
             return !ReferenceEquals(other, null) && IsEqual(other);
         }
@@ -35,7 +30,6 @@ namespace SimpleValueObjects
         protected abstract bool IsEqual(T notNullOther);
 
         // todo: is enforcing GetHashCode implementation necessary?
-
         public sealed override int GetHashCode()
         {
             return GenerateHashCode();
