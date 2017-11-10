@@ -34,7 +34,11 @@ Task("Pack")
     .IsDependentOn("Build")
     .Does(() =>
     {
-        DotNetCorePack("./SimpleValueObjects/SimpleValueObjects.csproj");
+        DotNetCorePack("./SimpleValueObjects/SimpleValueObjects.csproj", new DotNetCorePackSettings
+        {
+            Configuration = "Release",
+            OutputDirectory = "./Artifacts"
+        });
     });
 
 Task("Default")
