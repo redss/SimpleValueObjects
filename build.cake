@@ -1,12 +1,10 @@
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.4.0
 
-var target = Argument("target", "Default");
-
-var solutionFile = "./SimpleValueObjects.sln";
-
 Task("Build")
     .Does(() =>
     {
+        var solutionFile = "./SimpleValueObjects.sln";
+
         MSBuild(solutionFile, settings => settings
             .SetConfiguration("Release")
             .SetVerbosity(Verbosity.Minimal)
@@ -32,9 +30,15 @@ Task("Test")
         });
     });
 
-// todo: create package
+Task("Pack")
+    .IsDependentOn("Build")
+    .Does(() =>
+    {
+        DotNetCorePack("./SimpleValueObjects/SimpleValueObjects.csproj");
+    });
 
 Task("Default")
-    .IsDependentOn("Build");
+    .IsDependentOn("Test")
+    .IsDependentOn("Pack");
 
-RunTarget(target);
+RunTarget(Argument("target", "Default"));

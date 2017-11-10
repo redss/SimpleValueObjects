@@ -2,6 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Version>0.0.1</Version>
+    <Authors>Ryszard Tarajkowski</Authors>
+    <Company />
+    <Product />
+    <Description>A toolkit for simple creation of various value objects.</Description>
+    <PackageLicenseUrl>https://github.com/redss/SimpleValueObjects/blob/master/license</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/redss/SimpleValueObjects</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/redss/SimpleValueObjects</RepositoryUrl>
   </PropertyGroup>
 
 </Project>
