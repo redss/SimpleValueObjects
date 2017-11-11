@@ -31,7 +31,7 @@ namespace SimpleValueObjects.Tests
         }
     }
 
-    public class SpecificMonth : AutoComparableObject<SpecificMonth>
+    internal class SpecificMonth : AutoComparableObject<SpecificMonth>
     {
         public int Year { get; }
         public int Month { get; }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 // ReSharper disable StaticMemberInGenericType - this is our intention
@@ -25,26 +26,11 @@ namespace SimpleValueObjects
             return Equals(fieldInfo.GetValue(first), fieldInfo.GetValue(second));
         }
 
-        // GetHashCode implementation is based on https://stackoverflow.com/a/263416
-        // and https://stackoverflow.com/a/2816747
-
-        private const int HashCodePrime = 92821;
-
         protected sealed override int GenerateHashCode()
         {
-            return _fields.Aggregate(
-                seed: HashCodePrime,
-                func: IncludeFieldInHashCode);
-        }
+            var values = _fields.Select(field => field.GetValue(this));
 
-        private int IncludeFieldInHashCode(int hashCode, FieldInfo field)
-        {
-            unchecked
-            {
-                var fieldsHashCode = field.GetValue(this)?.GetHashCode() ?? 0;
-
-                return hashCode * HashCodePrime + fieldsHashCode;
-            }
+            return HashCodeCalculator.CalculateFromValues(values);
         }
     }
 }

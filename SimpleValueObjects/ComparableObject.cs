@@ -56,7 +56,7 @@ namespace SimpleValueObjects
             return (T) comparableObject;
         }
 
-        public static int Compare(T first, T second)
+        private static int Compare(T first, T second)
         {
             if (first != null)
             {
