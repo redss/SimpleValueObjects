@@ -2,7 +2,10 @@
 
 namespace SimpleValueObjects
 {
-    public abstract class WrapperComparableObject<T, TWrapped> : ComparableObject<T>
+    // todo: consider adding null check
+    // todo: consider adding implicit casts
+
+    internal abstract class WrapperComparableObject<T, TWrapped> : ComparableObject<T>
         where T : WrapperComparableObject<T, TWrapped>
         where TWrapped : IComparable<TWrapped>
     {
@@ -10,13 +13,6 @@ namespace SimpleValueObjects
 
         protected WrapperComparableObject(TWrapped value)
         {
-            if (ReferenceEquals(value, null))
-            {
-                throw new ArgumentException(
-                    $"{GetType().Name} cannot wrap null value.",
-                    nameof(value));
-            }
-
             Value = value;
         }
 

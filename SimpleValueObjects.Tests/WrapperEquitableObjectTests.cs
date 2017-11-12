@@ -1,25 +1,32 @@
-﻿using FluentAssertions;
+﻿using System.Collections.Generic;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace SimpleValueObjects.Tests
 {
     public class WrapperEquitableObjectTests
     {
-        [TestCase("same", "same", true)]
-        [TestCase(null, null, true)]
-        [TestCase("some", "other", false)]
-        [TestCase(null, "some", false)]
-        [TestCase("some", null, false)]
-        public void can_compare_two_wrappers(string firstValue, string secondValue, bool expectedResult)
+        [Datapoints]
+        public readonly string[] _stringDatapoints = 
         {
-            var wrapper = new SomeStringWrapper(firstValue);
-            var other = new SomeStringWrapper(secondValue);
+            null,
+            "some",
+            "other"
+        };
 
-            wrapper.Equals(other).Should().Be(expectedResult);
+        [Theory]
+        public void can_compare_two_wrappers(string firstValue, string secondValue)
+        {
+            var firstWrapped = new SomeStringWrapper(firstValue);
+            var secondWrapped = new SomeStringWrapper(secondValue);
+
+            var expectedResult = EqualityComparer<string>.Default.Equals(firstValue, secondValue);
+
+            firstWrapped.Equals(secondWrapped).Should().Be(expectedResult);
         }
 
         [TestCase("some")]
-        [TestCase("value")]
+        [TestCase("other")]
         public void can_compute_hash_code_for_a_wrapper(string value)
         {
             var wrapper = new SomeStringWrapper(value);
