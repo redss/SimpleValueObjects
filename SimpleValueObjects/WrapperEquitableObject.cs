@@ -1,7 +1,8 @@
-﻿using System;
-
-namespace SimpleValueObjects
+﻿namespace SimpleValueObjects
 {
+    // todo: consider adding null check
+    // todo: consider adding implicit casts
+
     public abstract class WrapperEquitableObject<T, TWrapped> : EquitableObject<T>
         where T : WrapperEquitableObject<T, TWrapped>
     {
@@ -9,34 +10,22 @@ namespace SimpleValueObjects
 
         protected WrapperEquitableObject(TWrapped value)
         {
-            if (value == null)
-            {
-                throw new ArgumentException(
-                    $"Cannot wrap null value in WrapperComparableObject of {typeof(TWrapped).Name}.",
-                    nameof(value));
-            }
-
             Value = value;
-        }
-
-        public static implicit operator TWrapped(WrapperEquitableObject<T, TWrapped> wrapper)
-        {
-            return wrapper.Value;
         }
 
         protected override bool IsEqual(T notNullOther)
         {
-            return Value.Equals(notNullOther.Value);
+            return Equals(Value, notNullOther.Value);
         }
 
         protected override int GenerateHashCode()
         {
-            return Value.GetHashCode();
+            return Value?.GetHashCode() ?? 0;
         }
 
         public override string ToString()
         {
-            return Value.ToString();
+            return Value?.ToString() ?? "<null>";
         }
     }
 }
