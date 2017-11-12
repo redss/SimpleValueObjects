@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace SimpleValueObjects
 {
-    // todo: test and make public
+    // todo: test and make public 
     // todo: consider approach using generic values and comparison builder
 
     internal abstract class AutoComparableObject<T> : ComparableObject<T>
