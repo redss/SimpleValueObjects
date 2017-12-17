@@ -6,8 +6,13 @@ namespace SimpleValueObjects
     // Implementation is based on https://stackoverflow.com/a/263416
     // and https://stackoverflow.com/a/2816747
 
-    internal static class HashCodeCalculator
+    public static class HashCodeCalculator
     {
+        public static int CalculateFromValues(params object[] values)
+        {
+            return CalculateFromValues(values.AsEnumerable());
+        }
+
         public static int CalculateFromValues(IEnumerable<object> values)
         {
             return values.Aggregate(

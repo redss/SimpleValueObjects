@@ -2,10 +2,18 @@
 
 namespace SimpleValueObjects
 {
+    /// <summary>
+    /// Implementations of ComparableObject will compare their order in consistent manner via CompareToNotNull
+    /// method, i. e. comparison will yield equivalent results with &lt;, &lt;=, ==, !=, &gt;= and &gt; operators as well as
+    /// IEquatable&lt;T&gt;.Equals, object.Equals, IComparable&lt;T&gt;.CompareTo and IComparable.CompareTo methods.
+    /// Also, nulls and types are handled properly: every value is greater than null, two nulls are always equal and different types are never equal.
+    /// Implementation stil has to handle generating correct hash code.
+    /// </summary>
+    /// <typeparam name="T">Class implementing ComparableObject</typeparam>
     public abstract class ComparableObject<T> : EquitableObject<T>, IComparable<T>, IComparable
         where T : ComparableObject<T>
     {
-        protected override bool IsEqual(T notNullOther)
+        protected override bool EqualsNotNull(T notNullOther)
         {
             return CompareToNotNull(notNullOther) == 0;
         }
@@ -29,6 +37,12 @@ namespace SimpleValueObjects
                 : CompareToNotNull(other);
         }
 
+        /// <summary>
+        /// Indicates whether current instance whether the current instance precedes, follows, 
+        /// or occurs in the same position in the sort order as another instance.
+        /// All other comparison means (operators, Equals and CompareTo methods) will use this implementation.
+        /// </summary>
+        /// <param name="notNullOther">An instance to compare, which is never null.</param>
         protected abstract int CompareToNotNull(T notNullOther);
 
         public static bool operator >(ComparableObject<T> first, ComparableObject<T> second)

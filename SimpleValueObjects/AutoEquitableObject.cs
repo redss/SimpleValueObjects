@@ -5,6 +5,18 @@ using System.Reflection;
 
 namespace SimpleValueObjects
 {
+    /// <summary>
+    /// Implementations of AutoEquitableObject will compute their equality based on their field value comparison.
+    /// 
+    /// Equality comparison will yield equivalent results with == and != operators as well as
+    /// IEquatable&lt;T&gt;.Equals and object.Equals methods. 
+    /// 
+    /// Also, nulls and types are handled properly: no value is equal to null,
+    /// two nulls are always equal and different types are never equal.
+    /// 
+    /// Generating hash code is also implemented.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public abstract class AutoEquitableObject<T> : EquitableObject<T>
         where T : AutoEquitableObject<T>
     {
@@ -15,7 +27,7 @@ namespace SimpleValueObjects
             _fields = typeof(T).GetInstanceFields().ToArray();
         }
 
-        protected sealed override bool IsEqual(T notNullOther)
+        protected sealed override bool EqualsNotNull(T notNullOther)
         {
             return _fields.All(field => FieldValuesAreEqual(field, this, notNullOther));
         }

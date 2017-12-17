@@ -105,7 +105,7 @@ namespace SimpleValueObjects.Tests
 
             public SomeEquitableObject(int value) => _value = value;
 
-            protected override bool IsEqual(SomeEquitableObject notNullOther) => _value == notNullOther._value;
+            protected override bool EqualsNotNull(SomeEquitableObject notNullOther) => _value == notNullOther._value;
 
             protected override int GenerateHashCode() => _value;
         }

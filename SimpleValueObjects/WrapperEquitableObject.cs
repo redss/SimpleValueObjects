@@ -13,7 +13,7 @@
             Value = value;
         }
 
-        protected override bool IsEqual(T notNullOther)
+        protected override bool EqualsNotNull(T notNullOther)
         {
             return Equals(Value, notNullOther.Value);
         }
