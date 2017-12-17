@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -6,12 +7,22 @@ namespace SimpleValueObjects
 {
     internal static class TypeExtensions
     {
-        // todo: include subtypes' fields
-        public static FieldInfo[] GetInstanceFields(this Type type)
+        public static IEnumerable<FieldInfo> GetInstanceFields(this Type type)
         {
-            return type.GetRuntimeFields()
-                .Where(field => !field.IsStatic)
-                .ToArray();
+            if (type == null)
+            {
+                return Enumerable.Empty<FieldInfo>();
+            }
+
+            var instanceFields = type.GetFields(
+                BindingFlags.Public
+                | BindingFlags.NonPublic
+                | BindingFlags.Instance
+                | BindingFlags.DeclaredOnly);
+
+            var baseInstanceFields = type.BaseType.GetInstanceFields();
+
+            return instanceFields.Concat(baseInstanceFields);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 
 // ReSharper disable StaticMemberInGenericType - this is our intention
@@ -13,7 +12,7 @@ namespace SimpleValueObjects
 
         static AutoEquitableObject()
         {
-            _fields = typeof(T).GetInstanceFields();
+            _fields = typeof(T).GetInstanceFields().ToArray();
         }
 
         protected sealed override bool IsEqual(T notNullOther)
