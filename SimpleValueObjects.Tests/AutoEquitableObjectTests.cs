@@ -9,7 +9,7 @@ namespace SimpleValueObjects.Tests
     public class AutoEquitableObjectTests
     {
         [Datapoints]
-        public readonly int[] _intDataset =
+        public readonly int[] IntDatapoints =
         {
             int.MinValue,
             -123,
@@ -19,7 +19,7 @@ namespace SimpleValueObjects.Tests
         };
 
         [Datapoints]
-        public readonly string[] _stringDatapoints =
+        public readonly string[] StringDatapoints =
         {
             null,
             "",

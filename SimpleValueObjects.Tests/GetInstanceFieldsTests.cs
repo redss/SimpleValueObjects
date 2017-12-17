@@ -7,7 +7,7 @@ using NUnit.Framework;
 // ReSharper disable MemberCanBePrivate.Local
 // ReSharper disable UnusedMember.Local
 
-namespace SimpleValueObjects.Tests.Properties
+namespace SimpleValueObjects.Tests
 {
     public class GetInstanceFieldsTests
     {
