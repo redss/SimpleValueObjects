@@ -1,11 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SimpleValueObjects
 {
-    // todo: consider adding null check
-    // todo: consider adding implicit casts
-
-    internal abstract class WrapperComparableObject<T, TWrapped> : ComparableObject<T>
+    public abstract class WrapperComparableObject<T, TWrapped> : ComparableObject<T>
         where T : WrapperComparableObject<T, TWrapped>
         where TWrapped : IComparable<TWrapped>
     {
@@ -16,19 +14,14 @@ namespace SimpleValueObjects
             Value = value;
         }
 
-        public static implicit operator TWrapped(WrapperComparableObject<T, TWrapped> wrapper)
-        {
-            return wrapper.Value;
-        }
-
         protected override int CompareToNotNull(T notNullOther)
         {
-            return Value.CompareTo(notNullOther);
+            return Comparer<TWrapped>.Default.Compare(Value, notNullOther.Value);
         }
 
         protected override int GenerateHashCode()
         {
-            return Value.GetHashCode();
+            return Value?.GetHashCode() ?? 0;
         }
 
         public override string ToString()

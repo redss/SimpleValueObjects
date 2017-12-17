@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace SimpleValueObjects.Tests
 {
-    public class WrapperComparableObjectTests
+    internal class WrapperComparableObjectTests
     {
         [Datapoints]
         public readonly int[] _intDataset =
@@ -17,22 +17,66 @@ namespace SimpleValueObjects.Tests
         };
 
         [Theory]
-        public void can_compare_wrapped_objects(int first, int second)
+        public void wrapper_objects_compare_like_their_wrapped_values(int firstValue, int secondValue)
         {
-            var firstWrapped = new SomeWrapped(first);
-            var secondWrapped = new SomeWrapped(second);
+            var firstWrapper = new ValueWrapper(firstValue);
+            var secondWrapper = new ValueWrapper(secondValue);
 
-            var valueComparison = Comparer<int>.Default.Compare(first, second);
-            var wrappedComparison = Comparer<SomeWrapped>.Default.Compare(firstWrapped, secondWrapped);
+            var valueComparison = Comparer<int>.Default.Compare(firstValue, secondValue);
+            var wrapperComparison = Comparer<ValueWrapper>.Default.Compare(firstWrapper, secondWrapper);
 
-            valueComparison.Should().Be(wrappedComparison);
+            valueComparison.Should().Be(wrapperComparison);
         }
 
-        // todo: test null cases
-
-        class SomeWrapped : WrapperComparableObject<SomeWrapped, int>
+        [Theory]
+        public void wrappers_hash_code_is_wrapped_values_has_code(int value)
         {
-            public SomeWrapped(int value) : base(value)
+            new ValueWrapper(value).GetHashCode().Should().Be(value.GetHashCode());
+        }
+
+        class ValueWrapper : WrapperComparableObject<ValueWrapper, int>
+        {
+            public ValueWrapper(int value) : base(value)
+            {
+            }
+        }
+
+        [Theory]
+        public void any_wrapped_value_is_greater_than_wrapped_null(int value)
+        {
+            var firstWrapper = new ReferenceWrapper(new ReferenceComparable(value));
+            var secondWrapper = new ReferenceWrapper(null);
+
+            Comparer<ReferenceWrapper>.Default.Compare(firstWrapper, secondWrapper)
+                .Should().BePositive();
+        }
+
+        [Test]
+        public void two_wrapped_nulls_are_equal()
+        {
+            var firstWrapped = new ReferenceWrapper(null);
+            var secondWrapped = new ReferenceWrapper(null);
+
+            Comparer<ReferenceWrapper>.Default.Compare(firstWrapped, secondWrapped)
+                .Should().Be(0);
+        }
+
+        [Test]
+        public void wrapped_nulls_hash_code_is_zero()
+        {
+            new ReferenceWrapper(null).GetHashCode().Should().Be(0);
+        }
+
+        class ReferenceWrapper : WrapperComparableObject<ReferenceWrapper, ReferenceComparable>
+        {
+            public ReferenceWrapper(ReferenceComparable value) : base(value)
+            {
+            }
+        }
+
+        class ReferenceComparable : WrapperComparableObject<ReferenceComparable, int>
+        {
+            public ReferenceComparable(int value) : base(value)
             {
             }
         }
