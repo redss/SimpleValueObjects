@@ -10,9 +10,13 @@ namespace SimpleValueObjects.Examples
             if (stars < 1 || stars > 5)
             {
                 throw new ArgumentException(
-                    $"UserRating should be between 1 and 5 stars, but found {stars}.");
+                    $"UserRating should be between 1 and 5 stars, but got {stars} stars.");
             }
         }
+
+        public static readonly MovieRating Lowest = new MovieRating(1);
+
+        public static readonly MovieRating Highest = new MovieRating(5);
 
         public override string ToString() => new string('★', count: Value);
     }

@@ -24,12 +24,33 @@ Domain Driven Design promotes using Value Object for representation of domain co
 
 ### `AutoEquitableObject`
 
-In most cases, a value object cosists of a few fields. Obviously, we consider two such objects equal, when their field values are also equal.
+In most cases, a Value Object cosists of a few fields. Obviously, we consider such objects equal, when their field values are also equal. 
 
 When you inherit from `AutoEquitableObject`, it will autimatically implement equality in a way, that two objects will be equal when values of their fields are equal.
 
-What do you need to do:
-* inherit from `AutoEquitableObject`.
+```cs
+public class Money : AutoEquitableObject<Money>
+{
+    public Currency Currency { get; }
+    public decimal Amount { get; }
+
+    public Money(Currency currency, decimal amount)
+    {
+        Currency = currency;
+        Amount = amount;
+
+        if (amount < 0)
+        {
+            throw new ArgumentException(
+                $"Money cannot have negative amount, but got {amount}.");
+        }
+    }
+
+    public bool IsNothing => Amount == 0 || Currency == Currency.Blemflarcks;
+
+    public override string ToString() => $"{Amount} {Currency}";
+}
+```
 
 What do you get:
 * consistent equality comparison based on its fields' values,
@@ -50,13 +71,33 @@ Remarks:
 
 ### `WrapperEquitableObject`
 
-Sometimes you'll want to use some more common Value Object, like `string` or `int`, and give them additional context. For instance, user name in a system can just be a string, but with limited length and consisting only of alphanumeric characters. Also, it makes sure, that noone uses "just any string" instead of a valid username by accident.
+Sometimes you'll want to use some more common Value Object, like `string` or `int`, and give them additional context. For instance, user name in a system can just be a string, but with limited length and consisting only of characters subset. Also, it makes sure, that noone passes "just any string" to some method instead of a valid username by accident.
 
-If that's the case, you can use `WrapperEquitableObject`. This way, equality comparison and hash code generation will work exactly like in a wrapped object.
+If that's the case, you can use `WrapperEquitableObject`, which wraps exactly one value and will use it for equality comparison and hash code computation.
 
-What do you need to do:
-* inherit from `WrapperEquitableObject`,
-* pass some value to a base constructor.
+```cs
+public class UserName : WrapperEquitableObject<UserName, string>
+{
+    public UserName(string userName)
+        : base(userName)
+    {
+        if (userName == null)
+        {
+            throw new ArgumentException(
+                "User name cannot be null.");
+        }
+
+        if (!_userNamePattern.IsMatch(userName))
+        {
+            throw new ArgumentException(
+                $"User name should match pattern {_userNamePattern}, " +
+                $"but found '{userName}' instead.");
+        }
+    }
+
+    private readonly Regex _userNamePattern = new Regex("[a-z0-9-]{5,25}");
+}
+```
 
 What do you get:
 * consistend equality comparison based on wrapped value,
@@ -72,12 +113,37 @@ Remarks:
 
 ### `EquitableObject`
 
-When you want to implement equality comparison logic by yourself, you can use `EquitableObject`. You only need to implement equality comparison and generating hash code once, and it will become consistant across different usages.
+When you want to implement equality comparison logic by yourself, you can use `EquitableObject`.
 
-What do you need to do:
-* inherit from `EquitableObject`,
-* implement `EqualsToNull`,
-* implement `GenerateHashCode`, (see _Generating hash codes_ section).
+```cs
+public class IntRange : EquitableObject<IntRange>
+{
+    public int From { get; }
+    public int To { get; }
+
+    public IntRange(int from, int to)
+    {
+        From = from;
+        To = to;
+
+        if (From > To)
+        {
+            throw new InvalidOperationException(
+                $"From cannot be greater than To in IntRange, but got: {From}-{To}.");
+        }
+    }
+
+    protected override bool EqualsNotNull(IntRange notNullOther)
+    {
+        return From == notNullOther.From && To == notNullOther.To;
+    }
+
+    protected override int GenerateHashCode()
+    {
+        return HashCodeCalculator.CalculateFromValues(From, To);
+    }
+}
+```
 
 What do you get:
 * overloaded `==` and `!=` operators,
@@ -88,7 +154,9 @@ What do you get:
 
 ## Comparable Value Objects
 
-Sometimes we want values that not only can be determined equal, but also can be placed in a certain order. Think of values like temperature, user rating or month. We can certainly say, that values of such types can be lesser, equal or greater that another values, e. g. 5 star rating is greater than 3 stars, or February comes after January.
+Sometimes we want values that not only can be determined equal, but also can be placed in a certain order. Most commonly used cases would be an `int` or a `DateTime`. We can certainly say, that values of such types can be lesser, equal or greater that another values.
+
+More custom examples would be: temperature, user rating or month. Again, they can be put in an order, e. g. 5 star rating is greater than just 3 stars, or February comes after January.
 
 In .NET such concept can be represented by:
 * `IComparable` and `IComparable<T>` implementations and
@@ -98,11 +166,28 @@ Following base classes do just that: implement `IComparable` interfaces and over
 
 ### `WrapperComparableObject`
 
-Like with `WrapperEquitableObject`, sometimes you'll want to wrap a simpler value to give it additional context. You can do that, if wrapped type implements `IComparable<T>`, which then will be used for comparison.
+Like with `WrapperEquitableObject`, sometimes you'll want to wrap a simpler value to give it additional context. You can do that, if wrapped type implements `IComparable<T>` (whete `T` is itself), which then will be used for comparison.
 
-What do you need to do:
-* inherit from `WrapperComparableObject`,
-* pass some value to a base constructor.
+```cs
+public class MovieRating : WrapperComparableObject<MovieRating, int>
+{
+    public MovieRating(int stars)
+        : base(stars)
+    {
+        if (stars < 1 || stars > 5)
+        {
+            throw new ArgumentException(
+                $"UserRating should be between 1 and 5 stars, but got {stars} stars.");
+        }
+    }
+
+    public static readonly MovieRating Lowest = new MovieRating(1);
+
+    public static readonly MovieRating Highest = new MovieRating(5);
+
+    public override string ToString() => new string('★', count: Value);
+}
+```
 
 What do you get:
 * overloaded `<`, `<=`, `==`, `!=`, `>` and `>=` operators,
@@ -115,10 +200,42 @@ What do you get:
 
 With `ComparableObject` you only implement comparison once, and all comparison and equality comparison logic are handled consistencly. Again, you have to implement generating hash code yourself.
 
-What do you need to do:
-* inherit from `ComparableObject`,
-* implement `CompareToNotNull`,
-* implement `GenerateHashCode` (see _Generating hash codes_ section)
+```cs
+public class YearMonth : ComparableObject<YearMonth>
+{
+    public int Year { get; }
+    public Month Month { get; }
+
+    public YearMonth(int year, Month month)
+    {
+        Year = year;
+        Month = month;
+
+        if (!Enum.IsDefined(typeof(Month), month))
+        {
+            throw new ArgumentException($"Month {month} is not valid.");
+        }
+    }
+
+    public YearMonth Next()
+    {
+        return Month == Month.December
+            ? new YearMonth(Year + 1, Month.January)
+            : new YearMonth(Year, Month + 1);
+    }
+
+    protected override int CompareToNotNull(YearMonth notNullOther)
+    {
+        return Year != notNullOther.Year
+            ? Year - notNullOther.Year
+            : Month - notNullOther.Month;
+    }
+
+    protected override int GenerateHashCode() => HashCodeCalculator.CalculateFromValues(Year, Month);
+
+    public override string ToString() => $"{Month} {Year}";
+}
+```
 
 What do you get:
 * overloaded `<`, `<=`, `==`, `!=`, `>` and `>=` operators,

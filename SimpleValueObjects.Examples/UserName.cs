@@ -11,13 +11,14 @@ namespace SimpleValueObjects.Examples
             if (userName == null)
             {
                 throw new ArgumentException(
-                    "UserName cannot be null.");
+                    "User name cannot be null.");
             }
 
             if (!_userNamePattern.IsMatch(userName))
             {
                 throw new ArgumentException(
-                    $"UserName should match pattern {_userNamePattern}, but found '{userName}' instead.");
+                    $"User name should match pattern {_userNamePattern}, " +
+                    $"but found '{userName}' instead.");
             }
         }
 
