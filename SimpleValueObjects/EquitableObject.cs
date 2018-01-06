@@ -3,17 +3,20 @@
 namespace SimpleValueObjects
 {
     /// <summary>
-    /// Implementations of EquitableObject will compare their equality in consistent manner based on EqualsNotNull implementation.
-    ///  
-    /// Equality comparison will yield equivalent results with == and != operators as well as
-    /// IEquatable&lt;T&gt;.Equals and object.Equals methods. 
-    /// 
-    /// Also, nulls and types are handled properly: no value is equal to null,
-    /// two nulls are always equal and different types are never equal.
-    /// 
-    /// Implementation stil has to handle generating correct hash code.
+    /// <para>
+    /// Implementations of this class will be equality 
+    /// compared using EqualsNotNull implementation.
+    /// </para>
+    /// <para>
+    /// Equality comparison will yield equivalent results with == and != 
+    /// operators as well as IEquatable&lt;T&gt;.Equals and object.Equals methods.
+    /// </para>
+    /// <para>
+    /// Following rules apply to equality comparison: no value is equal to null,
+    /// two nulls are always equal, different types are never equal.
+    /// </para>
     /// </summary>
-    /// <typeparam name="T">Class implementing EquitableObject</typeparam>
+    /// <typeparam name="T">A type implementing this class.</typeparam>
     public abstract class EquitableObject<T> : IEquatable<T>
         where T : EquitableObject<T>
     {
@@ -40,8 +43,7 @@ namespace SimpleValueObjects
         }
 
         /// <summary>
-        /// Indicates whether current instance is equal to another, not null instance.
-        /// All other equality comparison means (operators and Equals methods) will use this implementation.
+        /// Indicates whether current instance is equal to another instance.
         /// </summary>
         /// <param name="notNullOther">An instance to compare, which is never null.</param>
         protected abstract bool EqualsNotNull(T notNullOther);
@@ -52,9 +54,9 @@ namespace SimpleValueObjects
         }
 
         /// <summary>
-        /// Computes a hash code for a given instance.
-        /// See following for information on how to compute one:
-        /// https://docs.microsoft.com/en-us/dotnet/api/system.object.gethashcode?view=netframework-4.7.1#Remarks
+        /// Computes a hash code for a given instance. If two instances are euqal,
+        /// they should also return same hash code. See project documentation
+        /// for more information on why and how to implement this method.
         /// </summary>
         protected abstract int GenerateHashCode();
     }

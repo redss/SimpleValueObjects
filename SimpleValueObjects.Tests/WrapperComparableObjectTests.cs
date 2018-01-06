@@ -34,17 +34,18 @@ namespace SimpleValueObjects.Tests
             new ValueWrapper(value).GetHashCode().Should().Be(value.GetHashCode());
         }
 
-        class ValueWrapper : WrapperComparableObject<ValueWrapper, int>
+        [Theory]
+        public void wrapper_string_representation_is_same_as_wrapped_string_representation(int value)
         {
-            public ValueWrapper(int value) : base(value)
-            {
-            }
+            var wrapper = new ValueWrapper(value);
+
+            wrapper.ToString().Should().Be(value.ToString());
         }
 
         [Theory]
         public void any_wrapped_value_is_greater_than_wrapped_null(int value)
         {
-            var firstWrapper = new ReferenceWrapper(new ReferenceComparable(value));
+            var firstWrapper = new ReferenceWrapper(new ValueWrapper(value));
             var secondWrapper = new ReferenceWrapper(null);
 
             Comparer<ReferenceWrapper>.Default.Compare(firstWrapper, secondWrapper)
@@ -67,16 +68,24 @@ namespace SimpleValueObjects.Tests
             new ReferenceWrapper(null).GetHashCode().Should().Be(0);
         }
 
-        class ReferenceWrapper : WrapperComparableObject<ReferenceWrapper, ReferenceComparable>
+        [Test]
+        public void string_representation_for_wrapped_null_is_some_default_value()
         {
-            public ReferenceWrapper(ReferenceComparable value) : base(value)
+            var wrapper = new ReferenceWrapper(null);
+
+            wrapper.ToString().Should().Be("<null>");
+        }
+
+        class ReferenceWrapper : WrapperComparableObject<ReferenceWrapper, ValueWrapper>
+        {
+            public ReferenceWrapper(ValueWrapper value) : base(value)
             {
             }
         }
 
-        class ReferenceComparable : WrapperComparableObject<ReferenceComparable, int>
+        class ValueWrapper : WrapperComparableObject<ValueWrapper, int>
         {
-            public ReferenceComparable(int value) : base(value)
+            public ValueWrapper(int value) : base(value)
             {
             }
         }

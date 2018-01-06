@@ -6,30 +6,29 @@ using System.Reflection;
 namespace SimpleValueObjects
 {
     /// <summary>
-    /// Implementations of AutoEquitableObject will compute their equality based on their field value comparison.
-    /// 
-    /// Equality comparison will yield equivalent results with == and != operators as well as
-    /// IEquatable&lt;T&gt;.Equals and object.Equals methods. 
-    /// 
-    /// Also, nulls and types are handled properly: no value is equal to null,
-    /// two nulls are always equal and different types are never equal.
-    /// 
-    /// Generating hash code is also implemented.
+    /// <para>
+    /// Implementations of this class will be equality
+    /// compared based on equality of their field values.
+    /// Hash code is also computed based on field values.
+    /// </para>
+    /// <para>
+    /// Equality comparison will yield equivalent results with == and != 
+    /// operators as well as IEquatable&lt;T&gt;.Equals and object.Equals methods.
+    /// </para>
+    /// <para>
+    /// Following rules apply to equality comparison: no value is equal to null,
+    /// two nulls are always equal, different types are never equal.
+    /// </para>
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">A type implementing this class.</typeparam>
     public abstract class AutoEquitableObject<T> : EquitableObject<T>
         where T : AutoEquitableObject<T>
     {
-        private static readonly FieldInfo[] _fields;
-
-        static AutoEquitableObject()
-        {
-            _fields = typeof(T).GetInstanceFields().ToArray();
-        }
+        private static readonly FieldInfo[] _fields = typeof(T).GetInstanceFields().ToArray();
 
         protected sealed override bool EqualsNotNull(T notNullOther)
         {
-            return _fields.All(field => FieldValuesAreEqual(field, this, notNullOther));
+            return _fields.All(field => FieldValuesAreEqual(field, first: this, second: notNullOther));
         }
 
         private static bool FieldValuesAreEqual(FieldInfo fieldInfo, object first, object second)

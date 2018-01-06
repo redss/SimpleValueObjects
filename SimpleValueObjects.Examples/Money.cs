@@ -19,7 +19,7 @@ namespace SimpleValueObjects.Examples
             }
         }
 
-        public bool IsNothing => Amount == 0;
+        public bool IsNothing => Amount == 0 || Currency == Currency.Blemflarcks;
 
         public override string ToString() => $"{Amount} {Currency}";
     }
