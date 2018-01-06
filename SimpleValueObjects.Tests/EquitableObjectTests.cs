@@ -2,11 +2,8 @@
 using NUnit.Framework;
 
 // ReSharper disable SuspiciousTypeConversion.Global
-
 // ReSharper disable ExpressionIsAlwaysNull
-
-// ReSharper disable ConditionIsAlwaysTrueOrFalse - since we're
-// the ones who implement == and != arguments, it's not so sure
+// ReSharper disable ConditionIsAlwaysTrueOrFalse - since we overload == and != operators, it's not so sure
 
 namespace SimpleValueObjects.Tests
 {

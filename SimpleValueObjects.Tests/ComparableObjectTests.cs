@@ -3,9 +3,7 @@ using FluentAssertions;
 using NUnit.Framework;
 
 // ReSharper disable ExpressionIsAlwaysNull
-
-// ReSharper disable ConditionIsAlwaysTrueOrFalse - since we're
-// the ones who implement == and != arguments, it's not so sure
+// ReSharper disable ConditionIsAlwaysTrueOrFalse - since we overload == and != operators, it's not so sure
 
 namespace SimpleValueObjects.Tests
 {
@@ -65,6 +63,19 @@ namespace SimpleValueObjects.Tests
             Action comparing = () => first.CompareToObject(second);
 
             comparing.ShouldThrow<ArgumentException>();
+        }
+
+        [Test]
+        public void equality_comparing_objects_of_two_different_types_should_still_be_possible()
+        {
+            var first = new SomeComparableObject(1);
+            var second = "some string";
+
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+            Action equalityComparing = () => first.Equals(second);
+
+            equalityComparing.ShouldNotThrow();
         }
 
         private void ShouldBeGreaterThanAccordingToOperators(
