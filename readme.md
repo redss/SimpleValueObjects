@@ -2,11 +2,9 @@ _This library is a work in progress. Existing functionality is pretty much done,
 
 `SimpleValueObjects` is a .NET Standard library, that aims to provide a toolkit for simple creation of Value Objects.
 
-I believe such library can be useful, since .NET doesn't make implementation of proper Value Objects easy, with all it's nulls, operator overloading, non-generic methods overriding, etc. In other words, creating a valid value object by hand is tricky and can be quite a hassle, not to mention code and test duplication it produces.
+I believe such library can be useful, since .NET doesn't make implementation of proper Value Objects easy, with all it's nulls, operator overloading, non-generic methods overriding, etc. In other words, creating a valid Value Object by hand is tricky and can be quite a hassle, not to mention code and test duplication it produces.
 
 This library means to cover cases I've found most common when developing applications.
-
-<!-- include some "just show me the code" example -->
 
 # Value Objects
 
@@ -22,11 +20,28 @@ Domain Driven Design promotes using Value Object for representation of domain co
 
 ## Equitable Value Objects
 
+The core idea of Value Objects is that their equality is based on their values. The concept of equality in .NET can be represented in multiple ways though:
+
+* every object implements an `Equals` method,
+* there is a `GetHashCode` method that matches `Equals`,
+* there are equality operators: `==` and `!=`,
+* it is also common to implement `Equals` method in `IEquitable<T>` interface.
+
+Obviously, we want our Value Objects to determine equality in a consistent way, no matter which method is used. Achieving this in unfortunately quite a hassle, especially taking nulls, types and hash code generation into consideration.
+
+Using every base class in `SimpleValueObjects` will guarantee following things:
+
+* overloaded `==` and `!=` operators,
+* overridden `Object.Equals`,
+* `IEquitable<T>.Equals` implementation,
+* null handling: no value is equal to null and two nulls are always equal,
+* type handling: different types are never equal.
+
 ### `AutoEquitableObject`
 
-In most cases, a Value Object cosists of a few fields. Obviously, we consider such objects equal, when their field values are also equal. 
+In most cases, a Value Object consists of a few fields. Obviously, we consider such objects equal, when their field values are also equal.
 
-When you inherit from `AutoEquitableObject`, it will autimatically implement equality in a way, that two objects will be equal when values of their fields are equal.
+When you inherit from `AutoEquitableObject`, it will automatically implement equality in a way, that two objects will be equal when values of their fields are equal.
 
 ```cs
 public class Money : AutoEquitableObject<Money>
@@ -52,26 +67,14 @@ public class Money : AutoEquitableObject<Money>
 }
 ```
 
-What do you get:
-* consistent equality comparison based on its fields' values,
-* overloaded `==` and `!=` operators,
-* overridden `Object.Equals`,
-* `IEquitable<T>.Equals` implementation,
-* null handling: no value is equal to null and two nulls are always equal,
-* type handling: different types are never equal,
-* generating hash code based on its fields' values.
-
-Sample applications:
-* `DateTime` range, which consists of from and to dates,
-* money object, which consists of currency and amount.
-
 Remarks:
+
 * `AutoEquitableObject` uses reflection to get fields' values, which means it might be slow at times. I believe in most cases that is not a huge problem, however if you use your Value Object extensively you might want to use `EquitableObject`, which let's you implement equality comparison by hand.
-* Also, `AutoEquitableObject` _doesn't perform deep comparison_. It means, that if you want your value object to be more structured, you should either compose it from other value objects, or extend `EquitableObject` instead and implement equality comparison by hand.
+* Also, `AutoEquitableObject` _doesn't perform deep comparison_. It means, that if you want your Value Object to be more structured, you should either compose it from other Value Objects, or extend `EquitableObject` instead and implement equality comparison by hand.
 
 ### `WrapperEquitableObject`
 
-Sometimes you'll want to use some more common Value Object, like `string` or `int`, and give them additional context. For instance, user name in a system can just be a string, but with limited length and consisting only of characters subset. Also, it makes sure, that noone passes "just any string" to some method instead of a valid username by accident.
+Sometimes you'll want to use some more common Value Object, like `string` or `int`, and give them additional context. For instance, user name in a system can just be a string, but with limited length and consisting only of characters subset. Also, it makes sure, that no one passes "just any string" to some method instead of a valid username by accident.
 
 If that's the case, you can use `WrapperEquitableObject`, which wraps exactly one value and will use it for equality comparison and hash code computation.
 
@@ -99,16 +102,8 @@ public class UserName : WrapperEquitableObject<UserName, string>
 }
 ```
 
-What do you get:
-* consistend equality comparison based on wrapped value,
-* generating hash code based on wrapped value,
-* overloaded == and != operators,
-* overridden `Object.Equals`,
-* `IEquitable<T>.Equals` implementation,
-* null handling: no value is equal to null and two nulls are always equal,
-* type handling: different types are never equal.
-
 Remarks:
+
 * `WrapperEquitableObject` _doesn't perform deep comparison_. It means, that wrapped type should also be a Value Object.
 
 ### `EquitableObject`
@@ -145,28 +140,28 @@ public class IntRange : EquitableObject<IntRange>
 }
 ```
 
-What do you get:
-* overloaded `==` and `!=` operators,
-* overridden `Object.Equals`,
-* `IEquitable<T>.Equals` implementation,
-* null handling: no value is equal to null and two nulls are always equal,
-* type handling: different types are never equal.
-
 ## Comparable Value Objects
 
 Sometimes we want values that not only can be determined equal, but also can be placed in a certain order. Most commonly used cases would be an `int` or a `DateTime`. We can certainly say, that values of such types can be lesser, equal or greater that another values.
 
-More custom examples would be: temperature, user rating or month. Again, they can be put in an order, e. g. 5 star rating is greater than just 3 stars, or February comes after January.
+More custom examples would be: temperature, user rating or month. Again, they can be put in an order: 5 star rating is greater than just 3 stars, or February comes after January.
 
 In .NET such concept can be represented by:
 * `IComparable` and `IComparable<T>` implementations and
 * relational operators, i. e. `<`, `<=`, `>` and `>=`.
 
-Following base classes do just that: implement `IComparable` interfaces and overload rlational operators. Besides that, they handle equality in similar fashon as previous base classes.
+Following base classes will give you:
+
+* equivalent comparison and equality comparison,
+* overloaded `<`, `<=`, `==`, `!=`, `>` and `>=` operators,
+* overridden `Object.Equals`,
+* `IEquitable<T>`, `IComparable` and `IComparable<T>` implementations,
+* null handling: every value is greater than null, no value is equal to null and two nulls are always equal,
+* type handling: different types are never equal and comparing objects of different types will throw an exception.
 
 ### `WrapperComparableObject`
 
-Like with `WrapperEquitableObject`, sometimes you'll want to wrap a simpler value to give it additional context. You can do that, if wrapped type implements `IComparable<T>` (whete `T` is itself), which then will be used for comparison.
+Like with `WrapperEquitableObject`, sometimes you'll want to wrap a simpler value to give it additional context. You can do that, if wrapped type implements `IComparable<T>` (where `T` is itself), which then will be used for comparison.
 
 ```cs
 public class MovieRating : WrapperComparableObject<MovieRating, int>
@@ -189,16 +184,9 @@ public class MovieRating : WrapperComparableObject<MovieRating, int>
 }
 ```
 
-What do you get:
-* overloaded `<`, `<=`, `==`, `!=`, `>` and `>=` operators,
-* overridden `Object.Equals`,
-* `IEquitable<T>`, `IComparable` and `IComparable<T>` implementations,
-* null handling: every value is greater than null, no value is equal to null and two nulls are always equal,
-* type handling: different types are never equal and comparing objects of different types will throw an exception.
-
 ### `ComparableObject`
 
-With `ComparableObject` you only implement comparison once, and all comparison and equality comparison logic are handled consistencly. Again, you have to implement generating hash code yourself.
+With `ComparableObject` you only implement comparison once, and all comparison and equality comparison logic are handled consistently. Again, you have to implement generating hash code yourself.
 
 ```cs
 public class YearMonth : ComparableObject<YearMonth>
@@ -237,20 +225,13 @@ public class YearMonth : ComparableObject<YearMonth>
 }
 ```
 
-What do you get:
-* overloaded `<`, `<=`, `==`, `!=`, `>` and `>=` operators,
-* overridden `Object.Equals`,
-* `IEquitable<T>`, `IComparable` and `IComparable<T>` implementations,
-* null handling: every value is greater than null, no value is equal to null and two nulls are always equal,
-* type handling: different types are never equal and comparing objects of different types will throw an exception.
-
 # Generating hash codes
 
 Sometimes you'll need to generate a hash code by hand, e.g. when extending `EquitableObject` or `ComparableObject`. If you just want to generate a hash from a bunch of different values, you can use `HashCodeCalculator.CalculateFromValues` method.
 
 _Remember, that when to Value Objects are equal, their hash code should also be equal._
 
-Also, it might be worth checking out some offical souces:
+Also, it might be worth checking out some offical sources:
 
 https://docs.microsoft.com/en-us/dotnet/api/system.object.gethashcode?view=netframework-4.7.1#Remarks
 
