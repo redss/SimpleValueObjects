@@ -3,6 +3,7 @@ using FluentAssertions;
 using NUnit.Framework;
 
 #pragma warning disable 169
+#pragma warning disable 414
 
 // ReSharper disable MemberCanBePrivate.Local
 // ReSharper disable UnusedMember.Local

@@ -3,16 +3,14 @@ var configuration = "Release";
 Task("Build")
     .Does(() =>
     {
-        var solutionFile = "./SimpleValueObjects.sln";
+        var solutionPath = ".";
 
-        DotNetCoreClean(solutionFile, new DotNetCoreCleanSettings
+        DotNetCoreClean(solutionPath, new DotNetCoreCleanSettings
         {
             Configuration = configuration
         });
 
-        DotNetCoreRestore(".");
-
-        DotNetCoreBuild(solutionFile, new DotNetCoreBuildSettings
+        DotNetCoreBuild(solutionPath, new DotNetCoreBuildSettings
         {
             Configuration = configuration
         });
@@ -33,7 +31,7 @@ Task("Pack")
     .IsDependentOn("Build")
     .Does(() =>
     {
-        DotNetCorePack("./SimpleValueObjects/SimpleValueObjects.csproj", new DotNetCorePackSettings
+        DotNetCorePack("./SimpleValueObjects", new DotNetCorePackSettings
         {
             Configuration = configuration,
             OutputDirectory = "./Artifacts"
