@@ -17,15 +17,15 @@ namespace SimpleValueObjects
     /// </para>
     /// </summary>
     /// <typeparam name="T">A type implementing this class.</typeparam>
-    public abstract class EquitableObject<T> : IEquatable<T>
-        where T : EquitableObject<T>
+    public abstract class ValueObject<T> : IEquatable<T>
+        where T : ValueObject<T>
     {
-        public static bool operator !=(EquitableObject<T> first, EquitableObject<T> second)
+        public static bool operator !=(ValueObject<T> first, ValueObject<T> second)
         {
             return !(first == second);
         }
 
-        public static bool operator ==(EquitableObject<T> first, EquitableObject<T> second)
+        public static bool operator ==(ValueObject<T> first, ValueObject<T> second)
         {
             return ReferenceEquals(first, null)
                 ? ReferenceEquals(second, null)

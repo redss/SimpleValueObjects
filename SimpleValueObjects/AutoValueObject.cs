@@ -21,8 +21,8 @@ namespace SimpleValueObjects
     /// </para>
     /// </summary>
     /// <typeparam name="T">A type implementing this class.</typeparam>
-    public abstract class AutoEquitableObject<T> : EquitableObject<T>
-        where T : AutoEquitableObject<T>
+    public abstract class AutoValueObject<T> : ValueObject<T>
+        where T : AutoValueObject<T>
     {
         private static readonly FieldInfo[] _fields = typeof(T).GetInstanceFields().ToArray();
 

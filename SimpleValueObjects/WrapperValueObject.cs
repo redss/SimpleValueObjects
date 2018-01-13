@@ -17,12 +17,12 @@
     /// </summary>
     /// <typeparam name="T">A type implementing this class.</typeparam>
     /// <typeparam name="TWrapped">Type of a wrapped object.</typeparam>
-    public abstract class WrapperEquitableObject<T, TWrapped> : EquitableObject<T>
-        where T : WrapperEquitableObject<T, TWrapped>
+    public abstract class WrapperValueObject<T, TWrapped> : ValueObject<T>
+        where T : WrapperValueObject<T, TWrapped>
     {
         public TWrapped Value { get; }
 
-        protected WrapperEquitableObject(TWrapped value)
+        protected WrapperValueObject(TWrapped value)
         {
             Value = value;
         }

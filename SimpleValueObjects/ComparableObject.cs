@@ -22,7 +22,7 @@ namespace SimpleValueObjects
     /// </para>
     /// </summary>
     /// <typeparam name="T">A type implementing this class.</typeparam>
-    public abstract class ComparableObject<T> : EquitableObject<T>, IComparable<T>, IComparable
+    public abstract class ComparableObject<T> : ValueObject<T>, IComparable<T>, IComparable
         where T : ComparableObject<T>
     {
         protected override bool EqualsNotNull(T notNullOther)

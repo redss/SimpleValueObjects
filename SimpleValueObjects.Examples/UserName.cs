@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace SimpleValueObjects.Examples
 {
-    public class UserName : WrapperEquitableObject<UserName, string>
+    public class UserName : WrapperValueObject<UserName, string>
     {
         public UserName(string userName)
             : base(userName)

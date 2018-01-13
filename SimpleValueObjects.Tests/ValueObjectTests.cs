@@ -7,13 +7,13 @@ using NUnit.Framework;
 
 namespace SimpleValueObjects.Tests
 {
-    public class EquitableObjectTests
+    public class ValueObjectTests
     {
         [Test]
         public void identical_objects_are_always_equal_equal()
         {
-            var first = new SomeEquitableObject(1);
-            var second = new SomeEquitableObject(1);
+            var first = new SomeValueObject(1);
+            var second = new SomeValueObject(1);
 
             ShouldBeEqualAccordingToEqualityOperators(first, second);
             ShouldBeEqualAccordingToEqualsMethods(first, second);
@@ -23,8 +23,8 @@ namespace SimpleValueObjects.Tests
         [Test]
         public void different_objects_are_never_equal()
         {
-            var first = new SomeEquitableObject(1);
-            var second = new SomeEquitableObject(2);
+            var first = new SomeValueObject(1);
+            var second = new SomeValueObject(2);
 
             ShouldNotBeEqualAccordingToEqualityOperators(first, second);
             ShouldNotBeEqualAccordingToEqualsMethods(first, second);
@@ -34,8 +34,8 @@ namespace SimpleValueObjects.Tests
         [Test]
         public void any_value_is_never_equal_to_null()
         {
-            var something = new SomeEquitableObject(1);
-            SomeEquitableObject nothing = null;
+            var something = new SomeValueObject(1);
+            SomeValueObject nothing = null;
 
             ShouldNotBeEqualAccordingToEqualityOperators(something, nothing);
             ShouldNotBeEqualAccordingToEqualsMethods(something, nothing);
@@ -44,8 +44,8 @@ namespace SimpleValueObjects.Tests
         [Test]
         public void two_nulls_are_always_equal()
         {
-            SomeEquitableObject first = null;
-            SomeEquitableObject second = null;
+            SomeValueObject first = null;
+            SomeValueObject second = null;
 
             ShouldBeEqualAccordingToEqualityOperators(first, second);
             ShouldBeEqualAccordingToEqualityOperators(second, first);
@@ -54,7 +54,7 @@ namespace SimpleValueObjects.Tests
         [Test]
         public void any_value_is_always_equal_to_itself()
         {
-            var something = new SomeEquitableObject(1);
+            var something = new SomeValueObject(1);
 
             ShouldBeEqualAccordingToEqualityOperators(something, something);
             ShouldBeEqualAccordingToEqualsMethods(something, something);
@@ -63,12 +63,12 @@ namespace SimpleValueObjects.Tests
         [Test]
         public void two_different_types_are_never_equal()
         {
-            var something = new SomeEquitableObject(1);
+            var something = new SomeValueObject(1);
 
             something.Equals("some string").Should().BeFalse();
         }
 
-        private static void ShouldBeEqualAccordingToEqualityOperators(SomeEquitableObject first, SomeEquitableObject second)
+        private static void ShouldBeEqualAccordingToEqualityOperators(SomeValueObject first, SomeValueObject second)
         {
             (first == second).Should().BeTrue();
             (first != second).Should().BeFalse();
@@ -76,7 +76,7 @@ namespace SimpleValueObjects.Tests
             (second != first).Should().BeFalse();
         }
 
-        private static void ShouldNotBeEqualAccordingToEqualityOperators(SomeEquitableObject first, SomeEquitableObject second)
+        private static void ShouldNotBeEqualAccordingToEqualityOperators(SomeValueObject first, SomeValueObject second)
         {
             (first == second).Should().BeFalse();
             (first != second).Should().BeTrue();
@@ -84,25 +84,25 @@ namespace SimpleValueObjects.Tests
             (second != first).Should().BeTrue();
         }
 
-        private static void ShouldBeEqualAccordingToEqualsMethods(SomeEquitableObject first, SomeEquitableObject second)
+        private static void ShouldBeEqualAccordingToEqualsMethods(SomeValueObject first, SomeValueObject second)
         {
             first.Equals((object)second).Should().BeTrue();
             first.Equals(second).Should().BeTrue();
         }
 
-        private static void ShouldNotBeEqualAccordingToEqualsMethods(SomeEquitableObject first, SomeEquitableObject second)
+        private static void ShouldNotBeEqualAccordingToEqualsMethods(SomeValueObject first, SomeValueObject second)
         {
             first.Equals((object)second).Should().BeFalse();
             first.Equals(second).Should().BeFalse();
         }
 
-        class SomeEquitableObject : EquitableObject<SomeEquitableObject>
+        class SomeValueObject : ValueObject<SomeValueObject>
         {
             private readonly int _value;
 
-            public SomeEquitableObject(int value) => _value = value;
+            public SomeValueObject(int value) => _value = value;
 
-            protected override bool EqualsNotNull(SomeEquitableObject notNullOther) => _value == notNullOther._value;
+            protected override bool EqualsNotNull(SomeValueObject notNullOther) => _value == notNullOther._value;
 
             protected override int GenerateHashCode() => _value;
         }

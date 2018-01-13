@@ -2,7 +2,7 @@
 
 namespace SimpleValueObjects.Examples
 {
-    public class IntRange : EquitableObject<IntRange>
+    public class IntRange : ValueObject<IntRange>
     {
         public int From { get; }
         public int To { get; }

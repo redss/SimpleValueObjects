@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace SimpleValueObjects.Tests
 {
-    public class AutoEquitableObjectTests
+    public class AutoValueObjectTests
     {
         [Datapoints]
         public readonly int[] IntDatapoints =
@@ -57,7 +57,7 @@ namespace SimpleValueObjects.Tests
             first.GetHashCode().Should().NotBe(second.GetHashCode());
         }
 
-        class SomeValueObject : AutoEquitableObject<SomeValueObject>
+        class SomeValueObject : AutoValueObject<SomeValueObject>
         {
             public int SomeInt { get; }
             public string SomeString { get; }
@@ -81,7 +81,7 @@ namespace SimpleValueObjects.Tests
             first.GetHashCode().Should().Be(second.GetHashCode());
         }
 
-        class ValueObjectWithNoFields : AutoEquitableObject<ValueObjectWithNoFields>
+        class ValueObjectWithNoFields : AutoValueObject<ValueObjectWithNoFields>
         {
         }
     }

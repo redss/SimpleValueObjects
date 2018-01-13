@@ -23,14 +23,14 @@ Domain Driven Design promotes using Value Object for representation of domain co
 
 ## Using `SimpleValueObjects`
 
-### Equitable Value Objects
+### Value Objects
 
 The core idea of Value Objects is that their equality is based on their values. The concept of equality in .NET can be represented in multiple ways though:
 
 * every object implements an `Equals` method,
 * there is a `GetHashCode` method that matches `Equals`,
 * there are equality operators: `==` and `!=`,
-* it is also common to implement `Equals` method in `IEquitable<T>` interface.
+* it is also common to implement `Equals` method in `IEquatable<T>` interface.
 
 Obviously, we want our Value Objects to determine equality in a consistent way, no matter which method is used. Achieving this in unfortunately quite a hassle, especially taking nulls, types and hash code generation into consideration.
 
@@ -38,18 +38,18 @@ Using every base class in `SimpleValueObjects` will guarantee following things:
 
 * overloaded `==` and `!=` operators,
 * overridden `Object.Equals`,
-* `IEquitable<T>.Equals` implementation,
+* `IEquatable<T>.Equals` implementation,
 * null handling: no value is equal to null and two nulls are always equal,
 * type handling: different types are never equal.
 
-#### `AutoEquitableObject`
+#### `AutoValueObject`
 
 In most cases, a Value Object consists of a few fields. Obviously, we consider such objects equal, when their field values are also equal.
 
-When you inherit from `AutoEquitableObject`, it will automatically implement equality in a way, that two objects will be equal when values of their fields are equal.
+When you inherit from `AutoValueObject`, it will automatically implement equality in a way, that two objects will be equal when values of their fields are equal.
 
 ```cs
-public class Money : AutoEquitableObject<Money>
+public class Money : AutoValueObject<Money>
 {
     public Currency Currency { get; }
     public decimal Amount { get; }
@@ -74,17 +74,17 @@ public class Money : AutoEquitableObject<Money>
 
 Remarks:
 
-* `AutoEquitableObject` uses reflection to get fields' values, which means it might be slow at times. I believe in most cases that is not a huge problem, however if you use your Value Object extensively you might want to use `EquitableObject`, which let's you implement equality comparison by hand.
-* Also, `AutoEquitableObject` _doesn't perform deep comparison_. It means, that if you want your Value Object to be more structured, you should either compose it from other Value Objects, or extend `EquitableObject` instead and implement equality comparison by hand.
+* `AutoValueObject` uses reflection to get fields' values, which means it might be slow at times. I believe in most cases that is not a huge problem, however if you use your Value Object extensively you might want to use `ValueObject`, which let's you implement equality comparison by hand.
+* Also, `AutoValueObject` _doesn't perform deep comparison_. It means, that if you want your Value Object to be more structured, you should either compose it from other Value Objects, or extend `ValueObject` instead and implement equality comparison by hand.
 
-#### `WrapperEquitableObject`
+#### `WrapperValueObject`
 
 Sometimes you'll want to use some more common Value Object, like `string` or `int`, and give them additional context. For instance, user name in a system can just be a string, but with limited length and consisting only of characters subset. Also, it makes sure, that no one passes "just any string" to some method instead of a valid username by accident.
 
-If that's the case, you can use `WrapperEquitableObject`, which wraps exactly one value and will use it for equality comparison and hash code computation.
+If that's the case, you can use `WrapperValueObject`, which wraps exactly one value and will use it for equality comparison and hash code computation.
 
 ```cs
-public class UserName : WrapperEquitableObject<UserName, string>
+public class UserName : WrapperValueObject<UserName, string>
 {
     public UserName(string userName)
         : base(userName)
@@ -109,14 +109,14 @@ public class UserName : WrapperEquitableObject<UserName, string>
 
 Remarks:
 
-* `WrapperEquitableObject` _doesn't perform deep comparison_. It means, that wrapped type should also be a Value Object.
+* `WrapperValueObject` _doesn't perform deep comparison_. It means, that wrapped type should also be a Value Object.
 
-#### `EquitableObject`
+#### `ValueObject`
 
-When you want to implement equality comparison logic by yourself, you can use `EquitableObject`.
+When you want to implement equality comparison logic by yourself, you can use `ValueObject`.
 
 ```cs
-public class IntRange : EquitableObject<IntRange>
+public class IntRange : ValueObject<IntRange>
 {
     public int From { get; }
     public int To { get; }
@@ -160,13 +160,13 @@ Following base classes will give you:
 * equivalent comparison and equality comparison,
 * overloaded `<`, `<=`, `==`, `!=`, `>` and `>=` operators,
 * overridden `Object.Equals`,
-* `IEquitable<T>`, `IComparable` and `IComparable<T>` implementations,
+* `IEquatable<T>`, `IComparable` and `IComparable<T>` implementations,
 * null handling: every value is greater than null, no value is equal to null and two nulls are always equal,
 * type handling: different types are never equal and comparing objects of different types will throw an exception.
 
 #### `WrapperComparableObject`
 
-Like with `WrapperEquitableObject`, sometimes you'll want to wrap a simpler value to give it additional context. You can do that, if wrapped type implements `IComparable<T>` (where `T` is itself), which then will be used for comparison.
+Like with `WrapperValueObject`, sometimes you'll want to wrap a simpler value to give it additional context. You can do that, if wrapped type implements `IComparable<T>` (where `T` is itself), which then will be used for comparison.
 
 ```cs
 public class MovieRating : WrapperComparableObject<MovieRating, int>
@@ -232,7 +232,7 @@ public class YearMonth : ComparableObject<YearMonth>
 
 ## Generating hash codes
 
-Sometimes you'll need to generate a hash code by hand, e.g. when extending `EquitableObject` or `ComparableObject`. If you just want to generate a hash from a bunch of different values, you can use `HashCodeCalculator.CalculateFromValues` method.
+Sometimes you'll need to generate a hash code by hand, e.g. when extending `ValueObject` or `ComparableObject`. If you just want to generate a hash from a bunch of different values, you can use `HashCodeCalculator.CalculateFromValues` method.
 
 _Remember, that when to Value Objects are equal, their hash code should also be equal._
 

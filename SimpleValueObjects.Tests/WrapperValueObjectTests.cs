@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace SimpleValueObjects.Tests
 {
-    public class WrapperEquitableObjectTests
+    public class WrapperValueObjectTests
     {
         [Datapoints]
         public readonly string[] _stringDatapoints = 
@@ -70,7 +70,7 @@ namespace SimpleValueObjects.Tests
             wrapper.ToString().Should().Be("<null>");
         }
 
-        class SomeStringWrapper : WrapperEquitableObject<SomeStringWrapper, string>
+        class SomeStringWrapper : WrapperValueObject<SomeStringWrapper, string>
         {
             public SomeStringWrapper(string value) : base(value)
             {

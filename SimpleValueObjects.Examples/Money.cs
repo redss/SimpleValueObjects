@@ -2,7 +2,7 @@
 
 namespace SimpleValueObjects.Examples
 {
-    public class Money : AutoEquitableObject<Money>
+    public class Money : AutoValueObject<Money>
     {
         public Currency Currency { get; }
         public decimal Amount { get; }
