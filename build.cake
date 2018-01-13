@@ -1,32 +1,31 @@
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.4.0
+var configuration = "Release";
 
 Task("Build")
     .Does(() =>
     {
         var solutionFile = "./SimpleValueObjects.sln";
 
-        MSBuild(solutionFile, settings => settings
-            .SetConfiguration("Release")
-            .SetVerbosity(Verbosity.Minimal)
-            .WithTarget("Clean")
-        );
+        DotNetCoreClean(solutionFile, new DotNetCoreCleanSettings
+        {
+            Configuration = configuration
+        });
 
-        NuGetRestore(solutionFile);
         DotNetCoreRestore(".");
 
-        MSBuild(solutionFile, settings => settings
-            .SetConfiguration("Release")
-            .SetVerbosity(Verbosity.Minimal)
-        );
+        DotNetCoreBuild(solutionFile, new DotNetCoreBuildSettings
+        {
+            Configuration = configuration
+        });
     });
 
 Task("Test")
     .IsDependentOn("Build")
     .Does(() =>
     {
-        NUnit3("./SimpleValueObjects.Tests/bin/Release/SimpleValueObjects.Tests.dll", new NUnit3Settings
+        DotNetCoreTest("./SimpleValueObjects.Tests", new DotNetCoreTestSettings
         {
-            NoResults = true
+            Configuration = configuration,
+            NoBuild = true
         });
     });
 
@@ -36,7 +35,7 @@ Task("Pack")
     {
         DotNetCorePack("./SimpleValueObjects/SimpleValueObjects.csproj", new DotNetCorePackSettings
         {
-            Configuration = "Release",
+            Configuration = configuration,
             OutputDirectory = "./Artifacts"
         });
     });
