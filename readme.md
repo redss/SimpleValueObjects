@@ -3,38 +3,114 @@
 [![AppVeyor](https://img.shields.io/appveyor/ci/redss/simplevalueobjects.svg)](https://ci.appveyor.com/project/redss/simplevalueobjects)
 [![NuGet](https://img.shields.io/nuget/v/SimpleValueObjects.svg)](https://www.nuget.org/packages/SimpleValueObjects)
 
-_This library is a work in progress. Existing functionality is pretty much done, but public interfaces may change in the future._
+_This library is a work in progress. Existing functionality is pretty much done, but public interfaces may change._
 
-`SimpleValueObjects` is a .NET Standard library, that aims to provide a toolkit for simple creation of Value Objects.
+`SimpleValueObjects` is a toolkit that let's you create Value Objects easily. It's a .NET Standard library, so you can use it both on .NET Core and on good ol' .NET Framework.
+
+## Quickstart
+
+So you want to create a Value Object.
+
+First, install `SimpleValueObjects`:
+
+```
+PM> Install-Package SimpleValueObjects
+```
+
+Implement Value Object of your choice:
+
+```cs
+using SimpleValueObjects;
+
+public class Position : AutoValueObject<Position>
+{
+    public int X { get; }
+    public int Y { get; }
+
+    public Position(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+}
+```
+
+Lastly, enjoy hassle-free equality comparison:
+
+```cs
+var first = new Position(5, 5);
+var second = new Position(5, 5);
+
+Console.WriteLine(first == second); // True
+Console.WriteLine(first != second); // False
+Console.WriteLine(first.Equals(second)); // True
+```
+
+Also, since both equality comparison and generating hash codes are taken care of, you can use your Value Objects in all sorts of standard collections and LINQ methods:
+
+```cs
+private HashSet<Position> _visitedLocations;
+
+public bool WasLocationVisited(Position position)
+{
+    return _visitedLocations.Contains(position);
+}
+
+public IEnumerable<Position> NotVisitedLocations(IEnumerable<Position> positions)
+{
+    return positions.Except(_visitedLocations);
+}
+```
+
+<!-- todo: totally rethink this section...  -->
+
+## Library genesis
 
 I believe such library can be useful, since .NET doesn't make implementation of proper Value Objects easy, with all it's nulls, operator overloading, non-generic methods overriding, etc. In other words, creating a valid Value Object by hand is tricky and can be quite a hassle, not to mention code and test duplication it produces.
 
 This library means to cover cases I've found most common when developing applications.
 
-## Value Objects
+## Introduction to Value Objects
 
-A Value Object is an object:
-* that is immutable, and
-* whose equality is based on value, rather than identity.
+<!-- todo: finish this section -->
 
-This seemingly simple pattern has a wide range of applications. Actually, if you think about it, you're probably using ones on a daily basis - think of `string` or `DateTime`. Other popular examples are amounts of money, date ranges or geographical coordinates.
+A Value Object is an object, that:
+
+* represents a value,
+* is immutable and
+* whose equality is based on value, rather than identity or reference.
+
+This seemingly simple pattern has a wide range of applications. Actually, if you think about it, you're probably using ones on a daily basis - think of `string` or `DateTime`.
+
+Other popular examples are amounts of money, date ranges or geographical coordinates.
+
+<!-- todo: expand DDD section -->
 
 Domain Driven Design promotes using Value Object for representation of domain concepts, e. g. user names, product prices or ZIP codes.
 
+It seems pretty useful! However, .NET doesn't make implementation of proper Value Objects easy, with all it's nulls, operator overloading, non-generic methods overriding, etc. In other words, creating a valid Value Object by hand is tricky and can be quite a hassle, not to mention code and test duplication it produces.
+
+This library means to cover cases I've found most common when developing applications.
+
+<!-- todo: focus on more example/benefit based approach -->
+
+<!-- You've probably noticed, that these objects have some things in common:
+* they're always valid - you cannot create an instance of `DateTime` which points to 32nd of July;
+* you can compare their equality in a consistent way: comparing `string` instances using `==` will yield the same results as calling `Equals`, even though `string` is a reference type;
+* they implement `GetHashCode` correctly, meaning you can use them as keys in a `Dictionary<T>` or store them in `HashSet<T>`. -->
+
+<!-- todo: explain briefly why immutability is good for you -->
+
 ## Using `SimpleValueObjects`
+
+The library let's you create Value Objects using a few base classes which are described below. They're split into two groups:
+
+* Value Objects, which are equality compared and
+* Comparable Value Object, which are order compared - they can be lesser, equal or greater than one another.
 
 ### Value Objects
 
-The core idea of Value Objects is that their equality is based on their values. The concept of equality in .NET can be represented in multiple ways though:
-
-* every object implements an `Equals` method,
-* there is a `GetHashCode` method that matches `Equals`,
-* there are equality operators: `==` and `!=`,
-* it is also common to implement `Equals` method in `IEquatable<T>` interface.
-
-Obviously, we want our Value Objects to determine equality in a consistent way, no matter which method is used. Achieving this in unfortunately quite a hassle, especially taking nulls, types and hash code generation into consideration.
-
-Using every base class in `SimpleValueObjects` will guarantee following things:
+Using Value Object base classes will guarantee following things:
 
 * overloaded `==` and `!=` operators,
 * overridden `Object.Equals`,
@@ -46,7 +122,7 @@ Using every base class in `SimpleValueObjects` will guarantee following things:
 
 In most cases, a Value Object consists of a few fields. Obviously, we consider such objects equal, when their field values are also equal.
 
-When you inherit from `AutoValueObject`, it will automatically implement equality in a way, that two objects will be equal when values of their fields are equal.
+`AutoValueObject` will automatically implement equality and hash code generation using reflection.
 
 ```cs
 public class Money : AutoValueObject<Money>
@@ -79,9 +155,11 @@ Remarks:
 
 #### `WrapperValueObject`
 
-Sometimes you'll want to use some more common Value Object, like `string` or `int`, and give them additional context. For instance, user name in a system can just be a string, but with limited length and consisting only of characters subset. Also, it makes sure, that no one passes "just any string" to some method instead of a valid username by accident.
+Sometimes you'll just want to use some more common value, like `string` or `int`, and give it additional context.
 
-If that's the case, you can use `WrapperValueObject`, which wraps exactly one value and will use it for equality comparison and hash code computation.
+For instance, _user name_ in a system can be just a string, but with limited length and consisting only of alphanumeric characters.
+
+In that case ypu should use `WrapperValueObject`, which wraps exactly one value and will use it for equality comparison and hash code generation.
 
 ```cs
 public class UserName : WrapperValueObject<UserName, string>
@@ -149,15 +227,11 @@ public class IntRange : ValueObject<IntRange>
 
 Sometimes we want values that not only can be determined equal, but also can be placed in a certain order. Most commonly used cases would be an `int` or a `DateTime`. We can certainly say, that values of such types can be lesser, equal or greater that another values.
 
-More custom examples would be: temperature, user rating or month. Again, they can be put in an order: 5 star rating is greater than just 3 stars, or February comes after January.
+More custom examples would be: temperature, user rating or a month. Again, they can be put in an order: 5 star rating is greater than just 3 stars, or February comes after January.
 
-In .NET such concept can be represented by:
-* `IComparable` and `IComparable<T>` implementations and
-* relational operators, i. e. `<`, `<=`, `>` and `>=`.
+Using Comparable Value Object base classes will guarantee following things:
 
-Following base classes will give you:
-
-* equivalent comparison and equality comparison,
+* equivalent order comparison and equality comparison,
 * overloaded `<`, `<=`, `==`, `!=`, `>` and `>=` operators,
 * overridden `Object.Equals`,
 * `IEquatable<T>`, `IComparable` and `IComparable<T>` implementations,
@@ -232,13 +306,15 @@ public class YearMonth : ComparableObject<YearMonth>
 
 ## Generating hash codes
 
-Sometimes you'll need to generate a hash code by hand, e.g. when extending `ValueObject` or `ComparableObject`. If you just want to generate a hash from a bunch of different values, you can use `HashCodeCalculator.CalculateFromValues` method.
+Sometimes you'll need to generate a hash code by hand, e.g. when using `ValueObject` or `ComparableObject`. If you just want to generate a hash from a bunch of different values, you can use `HashCodeCalculator.CalculateFromValues` method:
 
-_Remember, that when to Value Objects are equal, their hash code should also be equal._
+```cs
+protected override int GenerateHashCode() => HashCodeCalculator.CalculateFromValues(Year, Month);
+```
 
-Also, it might be worth checking out some offical sources:
+_Remember: when two Value Objects are equal, their hash codes should also be equal._ 
 
-https://docs.microsoft.com/en-us/dotnet/api/system.object.gethashcode?view=netframework-4.7.1#Remarks
+If you're curious, you can check some [official sources](https://docs.microsoft.com/en-us/dotnet/api/system.object.gethashcode?view=netframework-4.7.1#Remarks).
 
 ## Resources
 
