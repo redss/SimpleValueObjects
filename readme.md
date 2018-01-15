@@ -62,14 +62,6 @@ public IEnumerable<Position> NotVisitedLocations(IEnumerable<Position> positions
 }
 ```
 
-<!-- todo: totally rethink this section...  -->
-
-## Library genesis
-
-I believe such library can be useful, since .NET doesn't make implementation of proper Value Objects easy, with all it's nulls, operator overloading, non-generic methods overriding, etc. In other words, creating a valid Value Object by hand is tricky and can be quite a hassle, not to mention code and test duplication it produces.
-
-This library means to cover cases I've found most common when developing applications.
-
 ## Introduction to Value Objects
 
 <!-- todo: finish this section -->
