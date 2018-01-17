@@ -5,11 +5,11 @@
 
 _This library is a work in progress. Existing functionality is pretty much done, but public interfaces may change._
 
-`SimpleValueObjects` is a toolkit that let's you create Value Objects easily. It's a .NET Standard library, so you can use it both on .NET Core and on good ol' .NET Framework.
+`SimpleValueObjects` is a toolkit that let's you implement Value Objects easily. It's a .NET Standard library, so you can use it both on .NET Core and good ol' .NET Framework.
 
 ## Quickstart
 
-So you want to create a Value Object.
+Let's say you want to create a `Position` class in your system. A perfect candidate for a Value Object!
 
 First, install `SimpleValueObjects`:
 
@@ -17,7 +17,7 @@ First, install `SimpleValueObjects`:
 PM> Install-Package SimpleValueObjects
 ```
 
-Implement Value Object of your choice:
+Implement your Value Object:
 
 ```cs
 using SimpleValueObjects;
@@ -35,7 +35,7 @@ public class Position : AutoValueObject<Position>
 }
 ```
 
-Lastly, enjoy hassle-free equality comparison:
+Enjoy hassle-free equality comparison:
 
 ```cs
 var first = new Position(5, 5);
@@ -72,17 +72,15 @@ A Value Object is an object, that:
 * is immutable and
 * whose equality is based on value, rather than identity or reference.
 
-This seemingly simple pattern has a wide range of applications. Actually, if you think about it, you're probably using ones on a daily basis - think of `string` or `DateTime`.
-
-Other popular examples are amounts of money, date ranges or geographical coordinates.
+This seemingly simple pattern has a wide range of applications. Actually, if you think about it, you're probably using ones on a daily basis - think of `string` or `DateTime`. Other popular examples are amounts of money, date ranges or geographical coordinates.
 
 <!-- todo: expand DDD section -->
 
-Domain Driven Design promotes using Value Object for representation of domain concepts, e. g. user names, product prices or ZIP codes.
+Domain Driven Design promotes using Value Objects for representation of domain concepts, e. g. user names, product prices or ZIP codes.
 
-It seems pretty useful! However, .NET doesn't make implementation of proper Value Objects easy, with all it's nulls, operator overloading, non-generic methods overriding, etc. In other words, creating a valid Value Object by hand is tricky and can be quite a hassle, not to mention code and test duplication it produces.
+Value Object seem pretty useful! However, .NET doesn't make implementation of proper Value Objects easy, with all its operator overloading, non-generic methods overriding, types handling, null handling and hash code generation. In other words, creating a solid Value Object by hand is tricky and can be quite a hassle, not to mention code and test duplication it produces.
 
-This library means to cover cases I've found most common when developing applications.
+This library is meant to make implementation of Value Objects as simple as possible.
 
 <!-- todo: focus on more example/benefit based approach -->
 
@@ -95,14 +93,14 @@ This library means to cover cases I've found most common when developing applica
 
 ## Using `SimpleValueObjects`
 
-The library let's you create Value Objects using a few base classes which are described below. They're split into two groups:
+This library consists of a few base classes you can use for different scenarios. They're split into two groups:
 
-* Value Objects, which are equality compared and
-* Comparable Value Object, which are order compared - they can be lesser, equal or greater than one another.
+* _Value Objects_, which are equality compared,
+* _Comparable Value Object_, which are order compared, i.e. they can be lesser, equal or greater than one another.
 
 ### Value Objects
 
-Using Value Object base classes will guarantee following things:
+Using Value Object base classes will provide following things:
 
 * overloaded `==` and `!=` operators,
 * overridden `Object.Equals`,
@@ -112,7 +110,7 @@ Using Value Object base classes will guarantee following things:
 
 #### `AutoValueObject`
 
-In most cases, a Value Object consists of a few fields. Obviously, we consider such objects equal, when their field values are also equal.
+In most cases, a Value Object consists of a few fields. Obviously, we consider such objects equal, when their fields' values are also equal.
 
 `AutoValueObject` will automatically implement equality and hash code generation using reflection.
 
@@ -134,8 +132,6 @@ public class Money : AutoValueObject<Money>
         }
     }
 
-    public bool IsNothing => Amount == 0 || Currency == Currency.Blemflarcks;
-
     public override string ToString() => $"{Amount} {Currency}";
 }
 ```
@@ -147,11 +143,11 @@ Remarks:
 
 #### `WrapperValueObject`
 
-Sometimes you'll just want to use some more common value, like `string` or `int`, and give it additional context.
+Sometimes you'll just want to use some more common value, like `string` or `int` and give it additional context.
 
 For instance, _user name_ in a system can be just a string, but with limited length and consisting only of alphanumeric characters.
 
-In that case ypu should use `WrapperValueObject`, which wraps exactly one value and will use it for equality comparison and hash code generation.
+In that case you should use `WrapperValueObject`, which wraps exactly one value and uses it for equality comparison and hash code generation.
 
 ```cs
 public class UserName : WrapperValueObject<UserName, string>
@@ -179,11 +175,13 @@ public class UserName : WrapperValueObject<UserName, string>
 
 Remarks:
 
-* `WrapperValueObject` _doesn't perform deep comparison_. It means, that wrapped type should also be a Value Object.
+* `WrapperValueObject` _doesn't perform deep comparison_. It means, that wrapped type should also be a value.
 
 #### `ValueObject`
 
 When you want to implement equality comparison logic by yourself, you can use `ValueObject`.
+
+You have to implement generating hash code yourself (see _generating hash codes_ section below).
 
 ```cs
 public class IntRange : ValueObject<IntRange>
@@ -257,7 +255,9 @@ public class MovieRating : WrapperComparableObject<MovieRating, int>
 
 #### `ComparableObject`
 
-With `ComparableObject` you only implement comparison once, and all comparison and equality comparison logic are handled consistently. Again, you have to implement generating hash code yourself.
+With `ComparableObject` you only implement comparison once, and all comparison and equality comparison logic are handled consistently.
+
+You have to implement generating hash code yourself (see _generating hash codes_ section below).
 
 ```cs
 public class YearMonth : ComparableObject<YearMonth>
