@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>0.0.3</Version>
+    <Version>0.0.4</Version>
     <Authors>Ryszard Tarajkowski</Authors>
     <Company />
     <Product />
@@ -11,8 +11,8 @@
     <PackageLicenseUrl>https://github.com/redss/SimpleValueObjects/blob/master/license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/redss/SimpleValueObjects</PackageProjectUrl>
     <RepositoryUrl>https://github.com/redss/SimpleValueObjects</RepositoryUrl>
-    <AssemblyVersion>0.0.3.0</AssemblyVersion>
-    <FileVersion>0.0.3.0</FileVersion>
+    <AssemblyVersion>0.0.4.0</AssemblyVersion>
+    <FileVersion>0.0.4.0</FileVersion>
   </PropertyGroup>
 
 </Project>
